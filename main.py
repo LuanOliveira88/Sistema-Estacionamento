@@ -20,12 +20,19 @@ def main(page: ft.Page):
                 placa.error_text = 'Não é uma placa válida.'
                 placa.value = ''
                 page.update()
+                #TODO: corrigir a persistência do error_text 
             else:
                 def encerrar_registro(e):
+                    for linha in _tabela.rows:
+                        if e.control.uid == linha.cells[-1].content.uid:
+                            linha.cells[3].content.value = datetime.now().strftime(r'%H:%M:%S')
+                            delta = datetime.strptime(linha.cells[3].content.value, r'%H:%M:%S') - datetime.strptime(linha.cells[2].content.value, r'%H:%M:%S')
+                            linha.cells[4].content.value = delta
+                            page.update()
 
-                    b.data[3] = datetime.now().strftime(r'%H:%M:%S')
-                    b.data[4] = f"R$ {4.00 * (datetime.strptime(b.data[3], r'%H:%M:%S') - datetime.strptime(b.data[2], r'%H:%M:%S')).seconds:.2f}"
-                    b.disabled = True
+                    # b.data[3] = datetime.now().strftime(r'%H:%M:%S')
+                    # b.data[4] = f"R$ {4.00 * (datetime.strptime(b.data[3], r'%H:%M:%S') - datetime.strptime(b.data[2], r'%H:%M:%S')).seconds:.2f}"
+                    # b.disabled = True
                     # _tabela.build_update_commands()
                     page.update()
 
@@ -59,9 +66,15 @@ def main(page: ft.Page):
                                 )
                             ),
                             ft.DataCell(
+                                ft.Text(
+                                    value=(valor_pagar := "Aguardando saída"),
+                                    italic=True
+                                )
+                            ),
+                            ft.DataCell(
                                 content=(
                                     b := ft.ElevatedButton(
-                                        width=110,
+                                        # width=110,
                                         text='Encerrar',
                                         on_click=encerrar_registro,
                                         data=[
@@ -145,25 +158,26 @@ def main(page: ft.Page):
         )
     )
     _tabela = ft.DataTable(
-            width=800,
-            bgcolor="YELLOW",
-            horizontal_lines=ft.border.BorderSide(0.5, "Gray"),
-            vertical_lines=ft.border.BorderSide(0.5, "Gray"),
-            columns=[
-                ft.DataColumn(label=ft.Text("Carro")),
-                ft.DataColumn(label=ft.Text("Placa")),
-                ft.DataColumn(ft.Text("Entrada")),
-                ft.DataColumn(ft.Text("Saída")),
-                ft.DataColumn(ft.Text("Total a Pagar")),
-                ft.DataColumn(
-                    ft.Text(
-                        text_align=ft.TextAlign.CENTER,
-                        width=100,
-                        value="Check"
-                    )
+        heading_row_color=ft.colors.BLACK12,
+        heading_row_height=100,
+        # column_spacing=223,
+        width=1406,
+        columns=[
+            ft.DataColumn(label=ft.Text("Carro")),
+            ft.DataColumn(label=ft.Text("Placa")),
+            ft.DataColumn(ft.Text("Entrada")),
+            ft.DataColumn(ft.Text("Saída")),
+            ft.DataColumn(ft.Text("Duração")),
+            ft.DataColumn(ft.Text("Total a Pagar")),
+            ft.DataColumn(
+                ft.Text(
+                    text_align=ft.TextAlign.CENTER,
+                    # width=100,
+                    value="Check"
                 )
-            ],
-        )
+            )
+        ],
+    )
     page.controls.append(
         ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
@@ -176,3 +190,4 @@ def main(page: ft.Page):
 
 
 ft.app(target=main)
+

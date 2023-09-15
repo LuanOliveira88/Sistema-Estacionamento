@@ -9,13 +9,16 @@ def main(page: ft.Page):
 
     def adicionar_linha(e):
         def clicou(e):
-            num1, num2, soma, produto = botao_clique.data
-            num1 = int(num1)
-            num2 = int(num2)
-            soma = num1 + num2
-            produto = num1 * num2
-            botao_clique.disabled = True
-            page.update()
+            for indice, linha in enumerate(tabela.rows):
+                if e.control.uid == linha.cells[-1].content.uid:
+                    linha.cells[2].content.value = f"{int(linha.cells[0].content.value) + int(linha.cells[1].content.value)}"
+                    # linha.cells[3].content.value = str(int(linha.cells[0].content.value) *
+                    #                                    int(linha.cells[1].content.value))
+                    print(linha.cells[0].content.value, linha.cells[1].content.value,
+                          int(linha.cells[0].content.value) + int(linha.cells[1].content.value),
+                          int(linha.cells[0].content.value) * int(linha.cells[1].content.value))
+                    print([item.content.value for item in linha.cells])
+        page.update()
 
         tabela.rows.append(
             (dr := ft.DataRow(
@@ -52,7 +55,10 @@ def main(page: ft.Page):
         ]
     )
 
-    botao = ft.FloatingActionButton(icon=ft.icons.ADD, on_click=adicionar_linha)
+    botao = ft.FloatingActionButton(
+        icon=ft.icons.ADD,
+        on_click=adicionar_linha
+    )
 
     page.add(
         tabela,
@@ -63,4 +69,6 @@ def main(page: ft.Page):
 
 
 ft.app(target=main)
+
+
 
